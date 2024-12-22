@@ -1,7 +1,3 @@
-# vtys
-veri tabanındaki sql kodlarım
-
-
 -- Temel tablo: Kisi (Ata Tablo)
 CREATE TABLE "Kisi" (
     "kisi_id" SERIAL PRIMARY KEY,
@@ -342,6 +338,20 @@ AFTER UPDATE ON "Musteri"
 FOR EACH ROW
 EXECUTE FUNCTION log_dogum_tarihi_guncelleme();
 
+--bayi telefon güncelleyen fonksiyon
+CREATE OR REPLACE FUNCTION log_bayi_telefon_guncelleme()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE NOTICE 'Bayi telefon numarası güncellendi: % -> %', OLD.telefon, NEW.telefon;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+--trigger
+CREATE TRIGGER bayi_telefon_guncelleme
+AFTER UPDATE OF "telefon" ON "Bayi"
+FOR EACH ROW
+EXECUTE FUNCTION log_bayi_telefon_guncelleme();
+
 
 ---saklı yordamlar
 
@@ -433,5 +443,10 @@ WHERE "kisi_id" = 1;
 CALL yeni_bayi_ekle(1, 'Yeni Bayi', '3125557890', 'Çankaya, Ankara');
 
 CALL musteri_bilgi_guncelle(1, 'Ahmet', 'Kaya', '5557776655', 'Bursa, Türkiye');
+
+
+UPDATE "Bayi"
+SET "telefon" = '7777777777'
+WHERE "bayi_id" = 1;
 
 
